@@ -1,5 +1,6 @@
 import './Counter';
 import './GithubLink';
+import './Pad';
 
 class App extends HTMLElement {
   constructor() {
@@ -15,7 +16,7 @@ class App extends HTMLElement {
       Array.from(
         { length: 16 },
         (_, i) =>
-          `<button class="pad" data-pad="${i + 1}"></button>` +
+          `<pad-button data-pad="${i + 1}"></pad-button>` +
           ((i + 1) % breakpoint === 0 ? '</div><div class="pad-row">' : '')
       ).join('') +
       '</div>';
@@ -61,24 +62,9 @@ class App extends HTMLElement {
         margin-bottom: 12px;
       }
       
-      .pad {
+      pad-button {
         flex: 1 1 calc(12.5% - 24px);
-        aspect-ratio: 1;
-        border-radius: 8px;
-        border-width: 3px;
-        border-color: var(--gray-dark);
-        border-style: solid;
-        background-color: var(--black);
-        cursor: pointer;
-        transition: all 0.1s ease;
-      }
-      
-      .pad:hover {
-        border-color: var(--red);
-      }
-      
-      .pad:active {
-        transform: scale(0.95);
+        display: block;
       }
       main {
         flex: 1;
