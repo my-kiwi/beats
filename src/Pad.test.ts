@@ -3,10 +3,10 @@ import './Pad';
 import { PadButton } from './Pad';
 
 describe('Pad', () => {
-  let pad: HTMLElement;
+  let pad: PadButton;
 
   beforeEach(() => {
-    pad = document.createElement('pad-button');
+    pad = document.createElement('pad-button') as PadButton;
     document.body.appendChild(pad);
   });
 
@@ -35,10 +35,9 @@ describe('Pad', () => {
   });
 
   it('toggleActive should add and remove active attribute', () => {
-    const cast = pad as PadButton;
-    cast.toggleActive();
+    pad.toggleActive();
     expect(pad.hasAttribute('active')).toBe(true);
-    cast.toggleActive();
+    pad.toggleActive();
     expect(pad.hasAttribute('active')).toBe(false);
   });
 
