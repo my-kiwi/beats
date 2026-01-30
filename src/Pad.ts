@@ -33,7 +33,7 @@ template.innerHTML = `
   <button part="button"></button>
 `;
 
-class PadButton extends HTMLElement {
+export class PadButton extends HTMLElement {
   button: HTMLButtonElement;
 
   constructor() {
