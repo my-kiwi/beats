@@ -1,7 +1,12 @@
 :root {
+  --unit: 12px;
+
   /** Color Palette */
   --white: #e0e0e0;
   --black: #121212;
+  --red: #ff4c4c;
+  --gray: #888888;
+  --gray-dark: #444444;
 
   /* Light theme variables (default) */
   --bg-color: var(--white);
@@ -23,6 +28,8 @@ body {
   padding: 0;
   display: flex;
   justify-content: center;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
 }
 
 /*make the footer always at the bottom*/
