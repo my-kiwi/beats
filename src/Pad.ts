@@ -64,5 +64,3 @@ export class PadButton extends HTMLElement {
 }
 
 customElements.define('pad-button', PadButton);
-
-export {};
