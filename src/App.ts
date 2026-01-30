@@ -1,4 +1,3 @@
-import './Counter';
 import './GithubLink';
 import './Pad';
 
