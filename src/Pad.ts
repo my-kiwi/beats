@@ -18,10 +18,6 @@ template.innerHTML = `
       padding: 0;
       box-shadow: 0 0 5px var(--gray-dark, #444);
     }
-    button:hover { 
-      border-color: var(--red, red); 
-      box-shadow: 0 0 10px var(--red, red);
-    }
     button:active { 
       transform: scale(0.95); 
     }
