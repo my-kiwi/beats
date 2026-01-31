@@ -20,19 +20,21 @@ describe('Pad', () => {
     expect(shadowRoot?.querySelector('button')).toBeDefined();
   });
 
-  it('toggleActive should add and remove active attribute', () => {
-    pad.toggleActive();
+  it('setActive should add and remove active attribute', () => {
+    pad.setActive(true);
     expect(pad.hasAttribute('active')).toBe(true);
-    pad.toggleActive();
+    pad.setActive(false);
     expect(pad.hasAttribute('active')).toBe(false);
   });
 
-  it('clicking the internal button toggles active state', () => {
+  it('clicking the internal button dispatches pad-clicked event', () => {
     const btn = pad.shadowRoot?.querySelector('button') as HTMLButtonElement;
     expect(btn).toBeDefined();
+    let eventFired = false;
+    pad.addEventListener('pad-clicked', () => {
+      eventFired = true;
+    });
     btn.click();
-    expect(pad.hasAttribute('active')).toBe(true);
-    btn.click();
-    expect(pad.hasAttribute('active')).toBe(false);
+    expect(eventFired).toBe(true);
   });
 });
