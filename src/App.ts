@@ -1,15 +1,24 @@
 import './GithubLink';
 import './pads/PadsGrid';
-import { PadButton } from './pads/Pad';
+import Sequencer from './sequencer/Sequencer';
+import LoopRecorder from './sequencer/LoopRecorder';
 
 class App extends HTMLElement {
-  private _loopId: number | undefined;
-  private _currentStep: number = -1;
-  private _recordings: Map<number, Set<PadButton>> = new Map();
+  private _sequencer: Sequencer;
+  private _loopRecorder: LoopRecorder;
 
   constructor() {
     super();
 
+    this._sequencer = new Sequencer(16, 50);
+    this._loopRecorder = new LoopRecorder();
+    this._sequencer.subscribe(this._loopRecorder);
+
+    this._renderUI();
+    this._setupEventHandlers();
+  }
+
+  private _renderUI() {
     const shadow = this.attachShadow({ mode: 'open' });
 
     shadow.innerHTML = `
@@ -55,78 +64,23 @@ class App extends HTMLElement {
       }
     `;
     shadow.appendChild(style);
+  }
 
-    // Wire play/pause buttons to PadButton helpers
+  private _setupEventHandlers() {
+    const shadow = this.shadowRoot!;
     const playBtn = shadow.getElementById('play');
     const pauseBtn = shadow.getElementById('pause');
-    playBtn?.addEventListener('click', () => this.startLoop());
-    pauseBtn?.addEventListener('click', () => this.stopLoop());
 
-    // Listen for pad clicks to record steps
+    playBtn?.addEventListener('click', () => this._sequencer.start());
+    pauseBtn?.addEventListener('click', () => this._sequencer.stop());
+
+    // Listen for pad clicks to record steps during playback
     shadow.addEventListener('pad-clicked', (e: unknown) => {
-      if (this._currentStep >= 0) {
-        this.recordPadAtStep((e as CustomEvent).detail.pad, this._currentStep);
+      const currentStep = this._sequencer.currentStep;
+      if (currentStep >= 0) {
+        this._loopRecorder.recordPadAtStep((e as CustomEvent).detail.pad, currentStep);
       }
     });
-  }
-
-  private recordPadAtStep(pad: PadButton, step: number) {
-    if (!this._recordings.has(step)) {
-      this._recordings.set(step, new Set());
-    }
-    const padsAtStep = this._recordings.get(step)!;
-    if (padsAtStep.has(pad)) {
-      // Already recorded at this step, remove it (toggle off)
-      padsAtStep.delete(pad);
-    } else {
-      // Record this pad at this step
-      padsAtStep.add(pad);
-    }
-    // Update pad active state for visual feedback if any step has pad recorded
-    pad.setActive(padsAtStep.has(pad));
-  }
-
-  private startLoop() {
-    if (this._loopId) return; // already running
-
-    const bpm = 50;
-    const msPerStep = Math.round(60000 / bpm / 4);
-    const pads = PadButton.instances;
-    let idx = 0;
-
-    this._loopId = window.setInterval(() => {
-      // clear previous highlight
-      pads.forEach((p) => {
-        p.removeAttribute('current');
-        p.setActive(false);
-      });
-
-      // Set current step and highlight the pad
-      this._currentStep = idx;
-      const pad = pads[idx % pads.length];
-      if (pad) {
-        pad.setAttribute('current', '');
-      }
-
-      // Play any recordings at this step
-      const recordedPads = this._recordings.get(idx) || new Set();
-      recordedPads.forEach((p) => {
-        p.setActive(true);
-        p.removeAttribute('current');
-        p.playAudio();
-      });
-
-      idx = (idx + 1) % pads.length;
-    }, msPerStep);
-  }
-
-  private stopLoop() {
-    if (this._loopId) {
-      clearInterval(this._loopId);
-      this._loopId = undefined;
-      this._currentStep = -1;
-      PadButton.instances.forEach((p) => p.removeAttribute('current'));
-    }
   }
 }
 

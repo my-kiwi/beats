@@ -1,0 +1,75 @@
+/**
+ * LoopRecorder manages step-based recording and playback of pad sequences.
+ * It handles toggling pads on/off at specific steps and playing them back.
+ */
+
+import { PadButton } from '../pads/Pad';
+import { SequencerListener } from './Sequencer';
+
+export class LoopRecorder implements SequencerListener {
+  private _recordings: Map<number, Set<PadButton>> = new Map();
+
+  recordPadAtStep(pad: PadButton, step: number) {
+    if (!this._recordings.has(step)) {
+      this._recordings.set(step, new Set());
+    }
+    const padsAtStep = this._recordings.get(step)!;
+    if (padsAtStep.has(pad)) {
+      // Already recorded at this step, remove it (toggle off)
+      padsAtStep.delete(pad);
+    } else {
+      // Record this pad at this step
+      padsAtStep.add(pad);
+    }
+    // Update pad visual state based on any recording at any step
+    this.updatePadActiveState(pad);
+  }
+
+  getRecordingsForStep(step: number): Set<PadButton> {
+    return this._recordings.get(step) || new Set();
+  }
+
+  clear() {
+    this._recordings.clear();
+  }
+
+  private updatePadActiveState(pad: PadButton) {
+    // Check if this pad is recorded at any step
+    let isRecorded = false;
+    for (const pads of this._recordings.values()) {
+      if (pads.has(pad)) {
+        isRecorded = true;
+        break;
+      }
+    }
+    pad.setActive(isRecorded);
+  }
+
+  /**
+   * Called by Sequencer when a step is reached
+   */
+  onStep(stepIndex: number) {
+    if (stepIndex < 0) {
+      // Sequencer stopped, clear current highlights
+      PadButton.instances.forEach((p) => p.removeAttribute('current'));
+      return;
+    }
+
+    // Clear all current highlights
+    PadButton.instances.forEach((p) => p.removeAttribute('current'));
+
+    // Highlight the current step's pad
+    const currentPad = PadButton.instances[stepIndex % PadButton.instances.length];
+    if (currentPad) {
+      currentPad.setAttribute('current', '');
+    }
+
+    // Play any recordings at this step
+    const recordedPads = this.getRecordingsForStep(stepIndex);
+    recordedPads.forEach((p) => {
+      p.playAudio();
+    });
+  }
+}
+
+export default LoopRecorder;
