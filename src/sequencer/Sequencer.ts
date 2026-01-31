@@ -3,6 +3,8 @@
  * It notifies listeners when each step is reached.
  */
 
+import { PadButton } from "../pads/Pad";
+
 export interface SequencerListener {
   onStep(stepIndex: number): void;
 }
@@ -57,6 +59,7 @@ export class Sequencer {
   }
 
   stop() {
+    PadButton.instances.forEach((p) => p.setPlaying(false));
     if (this.loopId) {
       clearInterval(this.loopId);
       this.loopId = undefined;
