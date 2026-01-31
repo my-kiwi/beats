@@ -5,6 +5,7 @@ template.innerHTML = `
       display: block;
     }
     button {
+      touch-action: manipulation; /** Prevent double-tap to zoom on mobile */
       width: 100%;
       height: 100%;
       aspect-ratio: 1;
