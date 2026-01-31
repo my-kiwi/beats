@@ -7,18 +7,21 @@ class App extends HTMLElement {
 
     const shadow = this.attachShadow({ mode: 'open' });
 
-    // Generate 16 pads (todo each pad should be a separate component)
+    // Generate 16 pads in a 2x8 grid
+    const totalPads = 16;
+    const rows = 2;
+    const breakpoint = totalPads / rows;
 
-    const breakpoint = 8;
-    const padsHTML =
-      '<div class="pad-row">' +
-      Array.from(
-        { length: 16 },
-        (_, i) =>
-          `<pad-button data-pad="${i + 1}"></pad-button>` +
-          ((i + 1) % breakpoint === 0 ? '</div><div class="pad-row">' : '')
-      ).join('') +
-      '</div>';
+    const padsHTML = Array.from({ length: rows }, (_, row) => {
+      const start = row * breakpoint + 1;
+
+      const pads = Array.from(
+        { length: breakpoint },
+        (_, i) => `<pad-button data-pad="${start + i}"></pad-button>`
+      ).join('');
+
+      return `<div class="pad-row">${pads}</div>`;
+    }).join('');
 
     shadow.innerHTML = `
       <header>
