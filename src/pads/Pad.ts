@@ -34,6 +34,11 @@ template.innerHTML = `
       box-shadow: 0 0 10px var(--green, #16a34a);
       background-color: rgba(22,163,74,0.08);
     }
+    :host([playing]) button {
+      border-color: var(--yellow, #eab308);
+      box-shadow: 0 0 10px var(--yellow, #eab308);
+      background-color: rgba(234,179,8,0.08);
+    }
     button:focus {
       outline: none; /** Remove default focus outline */
     }
@@ -98,6 +103,14 @@ export class PadButton extends HTMLElement {
       this.setAttribute('active', '');
     } else {
       this.removeAttribute('active');
+    }
+  }
+
+  setPlaying(playing: boolean) {
+    if (playing) {
+      this.setAttribute('playing', '');
+    } else {
+      this.removeAttribute('playing');
     }
   }
 

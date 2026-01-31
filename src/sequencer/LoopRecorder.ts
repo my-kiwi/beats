@@ -56,7 +56,10 @@ export class LoopRecorder implements SequencerListener {
     }
 
     // Clear all current highlights
-    PadButton.instances.forEach((p) => p.removeAttribute('current'));
+    PadButton.instances.forEach((p) => {
+      p.removeAttribute('current');
+      p.setPlaying(false);
+    });
 
     // Highlight the current step's pad
     const currentPad = PadButton.instances[stepIndex % PadButton.instances.length];
@@ -67,6 +70,7 @@ export class LoopRecorder implements SequencerListener {
     // Play any recordings at this step
     const recordedPads = this.getRecordingsForStep(stepIndex);
     recordedPads.forEach((p) => {
+      p.setPlaying(true);
       p.playAudio();
     });
   }
