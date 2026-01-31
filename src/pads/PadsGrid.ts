@@ -1,33 +1,35 @@
 import './Pad';
 
+const NUMBER_OF_PADS = 16;
+
 export class PadsGrid extends HTMLElement {
   constructor() {
     super();
 
     const shadow = this.attachShadow({ mode: 'open' });
 
-    const totalPads = 16;
-    const rows = 2;
-    const breakpoint = Math.floor(totalPads / rows);
+    // create 2 rows of 8 pads
+    const numberOfRows = 2;
+    const breakpoint = NUMBER_OF_PADS / numberOfRows;
 
-    const padsHTML = Array.from({ length: rows }, (_, row) => {
-      const start = row * breakpoint + 1;
-      const pads = Array.from(
-        { length: breakpoint },
-        (_, i) => `<pad-button data-pad="${start + i}"></pad-button>`
-      ).join('');
-      return `<div class="pad-row">${pads}</div>`;
-    }).join('');
+    for (let i = 0; i < NUMBER_OF_PADS; i += breakpoint) {
+      const row = document.createElement('div');
+      row.className = 'pad-row';
 
-    shadow.innerHTML = `
-      <div class="pads-grid">
-        ${padsHTML}
-      </div>
-    `;
+      for (let j = 0; j < breakpoint; j++) {
+        const pad = document.createElement('pad-button');
+        pad.dataset.pad = String(i + j + 1);
+        row.appendChild(pad);
+      }
+
+      shadow.appendChild(row);
+    }
 
     const style = document.createElement('style');
     style.textContent = `
-      .pads-grid {
+      :host {
+        display: block;
+        box-sizing: border-box;
         display: flex;
         flex-wrap: wrap;
         padding: 20px;
