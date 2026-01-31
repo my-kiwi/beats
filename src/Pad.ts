@@ -15,16 +15,20 @@ template.innerHTML = `
       border-color: var(--gray-dark, #444);
       background-color: var(--black, #000);
       cursor: pointer;
-      transition: all 0.1s ease;
       padding: 0;
       box-shadow: 0 0 5px var(--gray-dark, #444);
-    }
-    button:active { 
-      transform: scale(0.95); 
+      -webkit-tap-highlight-color: transparent; /** Remove tap highlight on mobile */
     }
     :host([active]) button { 
       border-color: var(--red, red); 
       box-shadow: 0 0 10px var(--red, red);
+    }
+    button:focus {
+      outline: none; /** Remove default focus outline */
+    }
+    button:focus-visible {
+      outline: 2px solid #2684ff; /** keep focus outline for keyboard navigation (accessibility) */
+      outline-offset: 2px;
     }
   </style>
   <button part="button"></button>
@@ -42,7 +46,8 @@ export class PadButton extends HTMLElement {
     const pad = this.getAttribute('data-pad');
     if (pad) this.button.setAttribute('data-pad', pad);
 
-    this.button.addEventListener('click', () => {
+    this.button.addEventListener('click', (e) => {
+      e.preventDefault();
       this.toggleActive();
     });
   }
