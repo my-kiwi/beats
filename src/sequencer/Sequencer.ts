@@ -3,7 +3,7 @@
  * It notifies listeners when each step is reached.
  */
 
-import { PadButton } from "../pads/Pad";
+import { PadButton } from '../pads/Pad';
 
 export interface SequencerListener {
   onStep(stepIndex: number): void;

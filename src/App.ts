@@ -2,6 +2,33 @@ import './GithubLink';
 import './pads/PadsGrid';
 import Sequencer from './sequencer/Sequencer';
 import LoopRecorder from './sequencer/LoopRecorder';
+import { PadButton } from './pads/Pad';
+
+interface PresetPattern {
+  padIndex: number;
+  steps: number[];
+}
+
+const BEAT_PRESETS: Record<string, PresetPattern[]> = {
+  'simple-kick': [
+    { padIndex: 0, steps: [0, 8] }, // Kick
+  ],
+  'basic-beat': [
+    { padIndex: 0, steps: [0, 8] }, // Kick
+    { padIndex: 1, steps: [4, 12] }, // Snare
+    { padIndex: 3, steps: [0, 2, 4, 6, 8, 10, 12, 14] }, // Hi-Hat Closed
+  ],
+  'four-four': [
+    { padIndex: 0, steps: [0, 4, 8, 12] }, // Kick
+    { padIndex: 1, steps: [4, 12] }, // Snare
+    { padIndex: 3, steps: [1, 3, 5, 7, 9, 11, 13, 15] }, // Hi-Hat Closed
+  ],
+  funky: [
+    { padIndex: 0, steps: [0, 6, 8, 14] }, // Kick
+    { padIndex: 1, steps: [4, 12] }, // Snare
+    { padIndex: 4, steps: [2, 7, 10, 15] }, // Hi-Hat Open
+  ],
+};
 
 class App extends HTMLElement {
   private sequencer: Sequencer;
@@ -28,6 +55,13 @@ class App extends HTMLElement {
           <label for="bpm-slider">BPM:</label>
           <input id="bpm-slider" type="range" min="20" max="200" value="50" />
           <span id="bpm-value">50</span>
+          <select id="preset-select">
+            <option value="">-- Presets --</option>
+            <option value="simple-kick">Simple Kick</option>
+            <option value="basic-beat">Basic Beat</option>
+            <option value="four-four">Four-Four</option>
+            <option value="funky">Funky</option>
+          </select>
         </div>
         <div class="controls">
           <button id="play">Start</button>
@@ -76,6 +110,9 @@ class App extends HTMLElement {
         min-width: 35px;
         text-align: right;
       }
+      header .bpm-control select {
+        padding: 4px 8px;
+      }
       header .controls {
         display: flex;
         gap: 8px;
@@ -97,6 +134,7 @@ class App extends HTMLElement {
     const clearBtn = shadow.getElementById('clear');
     const bpmSlider = shadow.getElementById('bpm-slider') as HTMLInputElement;
     const bpmValue = shadow.getElementById('bpm-value');
+    const presetSelect = shadow.getElementById('preset-select') as HTMLSelectElement;
 
     playBtn?.addEventListener('click', () => this.sequencer.start());
     pauseBtn?.addEventListener('click', () => this.sequencer.stop());
@@ -108,6 +146,14 @@ class App extends HTMLElement {
       if (bpmValue) bpmValue.textContent = String(bpm);
     });
 
+    presetSelect?.addEventListener('change', (e) => {
+      const presetKey = (e.target as HTMLSelectElement).value;
+      if (presetKey && BEAT_PRESETS[presetKey]) {
+        this.loadPreset(presetKey);
+        presetSelect.value = '';
+      }
+    });
+
     // Listen for pad clicks to record steps during playback
     shadow.addEventListener('pad-clicked', (e: unknown) => {
       const currentStep = this.sequencer.currentStep;
@@ -115,6 +161,23 @@ class App extends HTMLElement {
         this.loopRecorder.recordPadAtStep((e as CustomEvent).detail.pad, currentStep);
       }
     });
+  }
+
+  private loadPreset(presetKey: string) {
+    this.loopRecorder.clear();
+    const patterns = BEAT_PRESETS[presetKey];
+    const pads = PadButton.instances;
+
+    if (patterns) {
+      patterns.forEach((pattern) => {
+        const pad = pads[pattern.padIndex];
+        if (pad) {
+          pattern.steps.forEach((step) => {
+            this.loopRecorder.recordPadAtStep(pad, step);
+          });
+        }
+      });
+    }
   }
 }
 
