@@ -2,6 +2,25 @@ import './Pad';
 
 const NUMBER_OF_PADS = 16;
 
+const padNames: string[] = [
+  'Kick',
+  'Snare',
+  'Hi-Hat Closed',
+  'Hi-Hat Open',
+  'Clap',
+  'Tom Low',
+  'Tom Mid',
+  'Tom High',
+  'Rimshot',
+  'Cowbell',
+  'Crash Cymbal',
+  'Ride Cymbal',
+  'Shaker',
+  'Tambourine',
+  'Percussion',
+  'Fx Sweep',
+];
+
 export class PadsGrid extends HTMLElement {
   constructor() {
     super();
@@ -18,7 +37,8 @@ export class PadsGrid extends HTMLElement {
 
       for (let j = 0; j < breakpoint; j++) {
         const pad = document.createElement('pad-button');
-        pad.dataset.pad = String(i + j + 1);
+        const padIndex = i + j;
+        pad.dataset.pad = padNames[padIndex];
         row.appendChild(pad);
       }
 
