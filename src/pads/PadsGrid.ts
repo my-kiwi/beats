@@ -30,10 +30,7 @@ export class PadsGrid extends HTMLElement {
       :host {
         display: block;
         box-sizing: border-box;
-        display: flex;
-        flex-wrap: wrap;
-        padding: 20px;
-        width: calc(100% - 40px);
+        padding: var(--unit);
       }
       .pad-row {
         display: flex;
@@ -42,7 +39,7 @@ export class PadsGrid extends HTMLElement {
         margin-bottom: 12px;
       }
       pad-button {
-        flex: 1 1 calc(12.5% - 24px);
+        flex: 1;
         display: block;
       }
     `;
