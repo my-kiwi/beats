@@ -3,6 +3,7 @@ import './pads/PadsGrid';
 import Sequencer from './sequencer/Sequencer';
 import LoopRecorder from './sequencer/LoopRecorder';
 import { PadButton } from './pads/Pad';
+import audioManager from './audio/AudioManager';
 
 interface PresetPattern {
   padIndex: number;
@@ -136,6 +137,7 @@ class App extends HTMLElement {
     const bpmValue = shadow.getElementById('bpm-value');
     const presetSelect = shadow.getElementById('preset-select') as HTMLSelectElement;
 
+    audioManager.initialize();
     playBtn?.addEventListener('click', () => this.sequencer.start());
     pauseBtn?.addEventListener('click', () => this.sequencer.stop());
     clearBtn?.addEventListener('click', () => this.loopRecorder.clear());

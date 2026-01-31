@@ -53,7 +53,10 @@ export class LoopRecorder implements SequencerListener {
   onStep(stepIndex: number) {
     if (stepIndex < 0) {
       // Sequencer stopped, clear current highlights
-      PadButton.instances.forEach((p) => p.removeAttribute('current'));
+      PadButton.instances.forEach((p) => {
+        p.removeAttribute('current');
+        p.setPlaying(false);
+      });
       return;
     }
 

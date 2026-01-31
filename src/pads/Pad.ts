@@ -50,9 +50,11 @@ template.innerHTML = `
   <button part="button"></button>
 `;
 
+import audioManager from '../audio/AudioManager';
+
 export class PadButton extends HTMLElement {
   button: HTMLButtonElement;
-  audio: HTMLAudioElement | null = null;
+  soundName: string = '';
 
   name: string = '';
   static instances: PadButton[] = [];
@@ -90,10 +92,12 @@ export class PadButton extends HTMLElement {
       }
     } else if (name === 'data-path') {
       if (newV === null) {
-        this.audio = null;
+        this.soundName = '';
       } else {
-        this.audio = new Audio(`./samples/${newV}`);
-        this.audio.preload = 'auto';
+        this.soundName = newV;
+        audioManager.loadBuffer(newV, `./samples/${newV}`).catch((err) => {
+          console.warn(`Failed to load audio for pad ${this.name}:`, err);
+        });
       }
     }
   }
@@ -115,14 +119,8 @@ export class PadButton extends HTMLElement {
   }
 
   playAudio() {
-    if (this.audio) {
-      try {
-        this.audio.currentTime = 0;
-        const playResult = this.audio.play();
-        if (playResult && typeof playResult.catch === 'function') playResult.catch(() => {});
-      } catch (err) {
-        console.warn('Audio playback error', err);
-      }
+    if (this.soundName) {
+      audioManager.playSound(this.soundName);
     }
   }
 }

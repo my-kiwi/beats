@@ -1,16 +1,16 @@
 /**
- * Sequencer manages the timing and step progression of the loop.
- * It notifies listeners when each step is reached.
+ * Sequencer manages the timing and step progression of the loop using Tone.js.
+ * It notifies listeners when each step is reached with sample-accurate timing.
  */
 
-import { PadButton } from '../pads/Pad';
+import * as Tone from 'tone';
 
 export interface SequencerListener {
   onStep(stepIndex: number): void;
 }
 
 export class Sequencer {
-  private loopId: number | undefined;
+  private loop: Tone.Loop | undefined;
   private currentStepValue: number = -1;
   private bpm: number = 50;
   private totalSteps: number = 16;
@@ -19,6 +19,7 @@ export class Sequencer {
   constructor(totalSteps: number = 16, bpm: number = 50) {
     this.totalSteps = totalSteps;
     this.bpm = bpm;
+    Tone.Transport.bpm.value = bpm;
   }
 
   get currentStep(): number {
@@ -26,15 +27,12 @@ export class Sequencer {
   }
 
   get isRunning(): boolean {
-    return this.loopId !== undefined;
+    return Tone.Transport.state === 'started';
   }
 
   setBpm(bpm: number) {
     this.bpm = bpm;
-    if (this.isRunning) {
-      this.stop();
-      this.start();
-    }
+    Tone.Transport.bpm.value = bpm;
   }
 
   subscribe(listener: SequencerListener) {
@@ -46,26 +44,26 @@ export class Sequencer {
   }
 
   start() {
-    if (this.loopId) return; // already running
+    if (this.isRunning) return;
 
-    const msPerStep = Math.round(60000 / this.bpm / 4);
-    let idx = 0;
+    if (!this.loop) {
+      let idx = 0;
+      this.loop = new Tone.Loop(() => {
+        this.currentStepValue = idx;
+        this.notifyListeners(idx);
+        idx = (idx + 1) % this.totalSteps;
+      }, '16n'); // 16th note timing
+      this.loop.start(0);
+    }
 
-    this.loopId = window.setInterval(() => {
-      this.currentStepValue = idx;
-      this.notifyListeners(idx);
-      idx = (idx + 1) % this.totalSteps;
-    }, msPerStep);
+    Tone.Transport.start();
   }
 
   stop() {
-    PadButton.instances.forEach((p) => p.setPlaying(false));
-    if (this.loopId) {
-      clearInterval(this.loopId);
-      this.loopId = undefined;
-      this.currentStepValue = -1;
-      this.notifyListeners(-1);
-    }
+    if (!this.isRunning) return;
+    Tone.Transport.stop();
+    this.currentStepValue = -1;
+    this.notifyListeners(-1);
   }
 
   private notifyListeners(stepIndex: number) {
