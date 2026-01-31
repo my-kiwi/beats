@@ -43,7 +43,8 @@ export class PadsGrid extends HTMLElement {
       for (let j = 0; j < breakpoint; j++) {
         const pad = document.createElement('pad-button');
         const padIndex = i + j;
-        pad.dataset.pad = padsConfig[padIndex].name;
+            pad.dataset.pad = padsConfig[padIndex].name;
+            pad.dataset.path = padsConfig[padIndex].path;
         row.appendChild(pad);
       }
 

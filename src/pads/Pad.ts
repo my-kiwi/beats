@@ -42,6 +42,7 @@ template.innerHTML = `
 
 export class PadButton extends HTMLElement {
   button: HTMLButtonElement;
+  audio: HTMLAudioElement | null = null;
 
   constructor() {
     super();
@@ -59,11 +60,21 @@ export class PadButton extends HTMLElement {
     this.button.addEventListener('click', (e) => {
       e.preventDefault();
       this.toggleActive();
+      if (this.audio) {
+        try {
+          this.audio.currentTime = 0;
+          const playResult = this.audio.play();
+          if (playResult && typeof playResult.catch === 'function') playResult.catch(() => {});
+        } catch (err) {
+          // ignore playback errors in test or blocked environments
+          console.warn('Audio playback error', err);
+        }
+      }
     });
   }
 
   static get observedAttributes() {
-    return ['data-pad'];
+    return ['data-pad', 'data-path'];
   }
 
   attributeChangedCallback(name: string, _old: string | null, newV: string | null) {
@@ -76,6 +87,14 @@ export class PadButton extends HTMLElement {
         this.button.setAttribute('data-pad', newV);
         this.button.textContent = newV;
         this.button.setAttribute('aria-label', newV);
+      }
+    } else if (name === 'data-path') {
+      if (newV === null) {
+        this.audio = null;
+      } else {
+        const src = newV.startsWith('/') ? newV : `/${newV}`;
+        this.audio = new Audio(src);
+        this.audio.preload = 'auto';
       }
     }
   }
