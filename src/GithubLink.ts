@@ -63,8 +63,7 @@ class GithubLink extends HTMLElement {
         margin:auto;
         display:block;
         text-align: center;
-        padding: 1rem;
-        margin-top: 3rem;
+        padding-bottom: 1rem;
         color: var(--text-color);
       }
 
