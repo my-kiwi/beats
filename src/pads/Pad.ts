@@ -84,8 +84,7 @@ export class PadButton extends HTMLElement {
       if (newV === null) {
         this.audio = null;
       } else {
-        const src = newV.startsWith('/') ? newV : `/${newV}`;
-        this.audio = new Audio(src);
+        this.audio = new Audio(`./samples/${newV}`);
         this.audio.preload = 'auto';
       }
     }
