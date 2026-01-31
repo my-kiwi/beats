@@ -21,7 +21,7 @@ describe('App', () => {
 
   it('should contain pads and github link elements', () => {
     const shadowRoot = app.shadowRoot;
-    expect(shadowRoot?.innerHTML).toContain('<pad-button');
+    expect(shadowRoot?.innerHTML).toContain('<pads-grid>');
     expect(shadowRoot?.innerHTML).toContain('<github-link>');
   });
 });
