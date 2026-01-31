@@ -53,9 +53,15 @@ class App extends HTMLElement {
       <header>
         <h2>Beats</h2>
         <div class="bpm-control">
+          <select id="timing-select">
+            <option value="32n">32nd</option>
+            <option value="16n" selected>16th</option>
+            <option value="8n">8th</option>
+            <option value="4n">4th</option>
+          </select>
           <label for="bpm-slider">BPM:</label>
-          <input id="bpm-slider" type="range" min="20" max="200" value="50" />
-          <span id="bpm-value">50</span>
+          <input id="bpm-slider" type="range" min="20" max="200" value="100" />
+          <span id="bpm-value">100</span>
           <select id="preset-select">
             <option value="">-- Presets --</option>
             <option value="simple-kick">Simple Kick</option>
@@ -135,6 +141,7 @@ class App extends HTMLElement {
     const clearBtn = shadow.getElementById('clear');
     const bpmSlider = shadow.getElementById('bpm-slider') as HTMLInputElement;
     const bpmValue = shadow.getElementById('bpm-value');
+    const timingSelect = shadow.getElementById('timing-select') as HTMLSelectElement;
     const presetSelect = shadow.getElementById('preset-select') as HTMLSelectElement;
 
     audioManager.initialize();
@@ -146,6 +153,11 @@ class App extends HTMLElement {
       const bpm = parseInt((e.target as HTMLInputElement).value);
       this.sequencer.setBpm(bpm);
       if (bpmValue) bpmValue.textContent = String(bpm);
+    });
+
+    timingSelect?.addEventListener('change', (e) => {
+      const timing = (e.target as HTMLSelectElement).value;
+      this.sequencer.setNoteTiming(timing);
     });
 
     presetSelect?.addEventListener('change', (e) => {

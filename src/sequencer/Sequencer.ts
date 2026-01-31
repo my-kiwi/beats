@@ -12,13 +12,15 @@ export interface SequencerListener {
 export class Sequencer {
   private loop: Tone.Loop | undefined;
   private currentStepValue: number = -1;
-  private bpm: number = 50;
+  private bpm: number = 100;
   private totalSteps: number = 16;
+  private noteTiming: string = '16n';
   private listeners: Set<SequencerListener> = new Set();
 
-  constructor(totalSteps: number = 16, bpm: number = 50) {
+  constructor(totalSteps: number = 16, bpm: number = 100, noteTiming: string = '16n') {
     this.totalSteps = totalSteps;
     this.bpm = bpm;
+    this.noteTiming = noteTiming;
     Tone.Transport.bpm.value = bpm;
   }
 
@@ -33,6 +35,13 @@ export class Sequencer {
   setBpm(bpm: number) {
     this.bpm = bpm;
     Tone.Transport.bpm.value = bpm;
+  }
+
+  setNoteTiming(noteTiming: string) {
+    this.noteTiming = noteTiming;
+    if (this.loop) {
+      this.loop.interval = this.noteTiming;
+    }
   }
 
   subscribe(listener: SequencerListener) {
@@ -52,7 +61,7 @@ export class Sequencer {
         this.currentStepValue = idx;
         this.notifyListeners(idx);
         idx = (idx + 1) % this.totalSteps;
-      }, '16n'); // 16th note timing
+      }, this.noteTiming);
       this.loop.start(0);
     }
 
