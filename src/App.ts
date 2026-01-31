@@ -24,6 +24,11 @@ class App extends HTMLElement {
     shadow.innerHTML = `
       <header>
         <h2>Beats</h2>
+        <div class="bpm-control">
+          <label for="bpm-slider">BPM:</label>
+          <input id="bpm-slider" type="range" min="20" max="200" value="50" />
+          <span id="bpm-value">50</span>
+        </div>
         <div class="controls">
           <button id="play">Start</button>
           <button id="pause">Stop</button>
@@ -53,6 +58,24 @@ class App extends HTMLElement {
         justify-content: space-between;
         padding: 12px 20px;
       }
+      header .bpm-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        justify-content: center;
+      }
+      header .bpm-control label {
+        font-weight: bold;
+        white-space: nowrap;
+      }
+      header .bpm-control input[type="range"] {
+        width: 150px;
+      }
+      header .bpm-control span {
+        min-width: 35px;
+        text-align: right;
+      }
       header .controls {
         display: flex;
         gap: 8px;
@@ -72,10 +95,18 @@ class App extends HTMLElement {
     const playBtn = shadow.getElementById('play');
     const pauseBtn = shadow.getElementById('pause');
     const clearBtn = shadow.getElementById('clear');
+    const bpmSlider = shadow.getElementById('bpm-slider') as HTMLInputElement;
+    const bpmValue = shadow.getElementById('bpm-value');
 
     playBtn?.addEventListener('click', () => this.sequencer.start());
     pauseBtn?.addEventListener('click', () => this.sequencer.stop());
     clearBtn?.addEventListener('click', () => this.loopRecorder.clear());
+
+    bpmSlider?.addEventListener('input', (e) => {
+      const bpm = parseInt((e.target as HTMLInputElement).value);
+      this.sequencer.setBpm(bpm);
+      if (bpmValue) bpmValue.textContent = String(bpm);
+    });
 
     // Listen for pad clicks to record steps during playback
     shadow.addEventListener('pad-clicked', (e: unknown) => {

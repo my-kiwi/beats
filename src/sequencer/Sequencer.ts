@@ -29,6 +29,10 @@ export class Sequencer {
 
   setBpm(bpm: number) {
     this.bpm = bpm;
+    if (this.isRunning) {
+      this.stop();
+      this.start();
+    }
   }
 
   subscribe(listener: SequencerListener) {
