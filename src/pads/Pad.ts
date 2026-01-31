@@ -60,8 +60,11 @@ export class PadButton extends HTMLElement {
 
     this.button.addEventListener('click', (e) => {
       e.preventDefault();
-      this.toggleActive();
       this.playAudio();
+      // Dispatch event for App to handle recording if sequencer is running
+      this.dispatchEvent(
+        new CustomEvent('pad-clicked', { detail: { pad: this }, bubbles: true, composed: true })
+      );
     });
     PadButton.instances.push(this);
   }
@@ -90,9 +93,12 @@ export class PadButton extends HTMLElement {
     }
   }
 
-  toggleActive() {
-    if (this.hasAttribute('active')) this.removeAttribute('active');
-    else this.setAttribute('active', '');
+  setActive(active: boolean) {
+    if (active) {
+      this.setAttribute('active', '');
+    } else {
+      this.removeAttribute('active');
+    }
   }
 
   playAudio() {
