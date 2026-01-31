@@ -27,6 +27,7 @@ class App extends HTMLElement {
         <div class="controls">
           <button id="play">Start</button>
           <button id="pause">Stop</button>
+          <button id="clear">Clear</button>
         </div>
       </header>
       <main>
@@ -70,9 +71,11 @@ class App extends HTMLElement {
     const shadow = this.shadowRoot!;
     const playBtn = shadow.getElementById('play');
     const pauseBtn = shadow.getElementById('pause');
+    const clearBtn = shadow.getElementById('clear');
 
     playBtn?.addEventListener('click', () => this.sequencer.start());
     pauseBtn?.addEventListener('click', () => this.sequencer.stop());
+    clearBtn?.addEventListener('click', () => this.loopRecorder.clear());
 
     // Listen for pad clicks to record steps during playback
     shadow.addEventListener('pad-clicked', (e: unknown) => {

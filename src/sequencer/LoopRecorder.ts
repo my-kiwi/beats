@@ -31,6 +31,8 @@ export class LoopRecorder implements SequencerListener {
 
   clear() {
     this.recordings.clear();
+    // Reset active state for all pads
+    PadButton.instances.forEach((p) => p.setActive(false));
   }
 
   private updatePadActiveState(pad: PadButton) {
