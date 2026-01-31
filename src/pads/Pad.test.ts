@@ -20,20 +20,6 @@ describe('Pad', () => {
     expect(shadowRoot?.querySelector('button')).toBeDefined();
   });
 
-  it('should set data-pad on internal button when host has data-pad attribute', () => {
-    const p = document.createElement('pad-button');
-    p.setAttribute('data-pad', 'kick');
-    document.body.appendChild(p);
-    const btn = p.shadowRoot?.querySelector('button') as HTMLButtonElement;
-    expect(btn?.getAttribute('data-pad')).toBe('kick');
-  });
-
-  it('should update internal button when data-pad attribute changes', () => {
-    const btn = pad.shadowRoot?.querySelector('button') as HTMLButtonElement;
-    pad.setAttribute('data-pad', 'snare');
-    expect(btn?.getAttribute('data-pad')).toBe('snare');
-  });
-
   it('toggleActive should add and remove active attribute', () => {
     pad.toggleActive();
     expect(pad.hasAttribute('active')).toBe(true);

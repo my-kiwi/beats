@@ -7,7 +7,8 @@ type PadConfig = {
   path: string;
 };
 
-const padsConfig: PadConfig[] = [
+// todo move to a JSON or similar
+export const padsConfig: PadConfig[] = [
   { name: 'Kick', path: 'General Kick 1.mp3' },
   { name: 'Snare', path: 'General Snare 1.mp3' },
   { name: 'Snare 2', path: 'General Room Snare 2.mp3' },
@@ -43,8 +44,8 @@ export class PadsGrid extends HTMLElement {
       for (let j = 0; j < breakpoint; j++) {
         const pad = document.createElement('pad-button');
         const padIndex = i + j;
-            pad.dataset.pad = padsConfig[padIndex].name;
-            pad.dataset.path = padsConfig[padIndex].path;
+        pad.dataset.pad = padsConfig[padIndex].name;
+        pad.dataset.path = padsConfig[padIndex].path;
         row.appendChild(pad);
       }
 

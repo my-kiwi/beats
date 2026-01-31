@@ -29,6 +29,11 @@ template.innerHTML = `
       border-color: var(--red, red); 
       box-shadow: 0 0 10px var(--red, red);
     }
+    :host([current]) button {
+      border-color: var(--green, #16a34a);
+      box-shadow: 0 0 10px var(--green, #16a34a);
+      background-color: rgba(22,163,74,0.08);
+    }
     button:focus {
       outline: none; /** Remove default focus outline */
     }
@@ -44,33 +49,21 @@ export class PadButton extends HTMLElement {
   button: HTMLButtonElement;
   audio: HTMLAudioElement | null = null;
 
+  name: string = '';
+  static instances: PadButton[] = [];
+
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: 'open' });
     shadow.appendChild(template.content.cloneNode(true));
     this.button = shadow.querySelector('button') as HTMLButtonElement;
 
-    // const pad = this.getAttribute('data-pad');
-    // if (pad) {
-    //   console.log('Pad button created for pad:', pad);
-    //   this.button.textContent = pad;
-    //   this.button.setAttribute('aria-label', pad);
-    // }
-
     this.button.addEventListener('click', (e) => {
       e.preventDefault();
       this.toggleActive();
-      if (this.audio) {
-        try {
-          this.audio.currentTime = 0;
-          const playResult = this.audio.play();
-          if (playResult && typeof playResult.catch === 'function') playResult.catch(() => {});
-        } catch (err) {
-          // ignore playback errors in test or blocked environments
-          console.warn('Audio playback error', err);
-        }
-      }
+      this.playAudio();
     });
+    PadButton.instances.push(this);
   }
 
   static get observedAttributes() {
@@ -80,11 +73,10 @@ export class PadButton extends HTMLElement {
   attributeChangedCallback(name: string, _old: string | null, newV: string | null) {
     if (name === 'data-pad' && this.button) {
       if (newV === null) {
-        this.button.removeAttribute('data-pad');
         this.button.textContent = '';
         this.button.removeAttribute('aria-label');
       } else {
-        this.button.setAttribute('data-pad', newV);
+        this.name = newV;
         this.button.textContent = newV;
         this.button.setAttribute('aria-label', newV);
       }
@@ -102,6 +94,18 @@ export class PadButton extends HTMLElement {
   toggleActive() {
     if (this.hasAttribute('active')) this.removeAttribute('active');
     else this.setAttribute('active', '');
+  }
+
+  playAudio() {
+    if (this.audio) {
+      try {
+        this.audio.currentTime = 0;
+        const playResult = this.audio.play();
+        if (playResult && typeof playResult.catch === 'function') playResult.catch(() => {});
+      } catch (err) {
+        console.warn('Audio playback error', err);
+      }
+    }
   }
 }
 
