@@ -4,21 +4,21 @@ import Sequencer from './sequencer/Sequencer';
 import LoopRecorder from './sequencer/LoopRecorder';
 
 class App extends HTMLElement {
-  private _sequencer: Sequencer;
-  private _loopRecorder: LoopRecorder;
+  private sequencer: Sequencer;
+  private loopRecorder: LoopRecorder;
 
   constructor() {
     super();
 
-    this._sequencer = new Sequencer(16, 50);
-    this._loopRecorder = new LoopRecorder();
-    this._sequencer.subscribe(this._loopRecorder);
+    this.sequencer = new Sequencer(16, 50);
+    this.loopRecorder = new LoopRecorder();
+    this.sequencer.subscribe(this.loopRecorder);
 
-    this._renderUI();
-    this._setupEventHandlers();
+    this.renderUI();
+    this.setupEventHandlers();
   }
 
-  private _renderUI() {
+  private renderUI() {
     const shadow = this.attachShadow({ mode: 'open' });
 
     shadow.innerHTML = `
@@ -66,19 +66,19 @@ class App extends HTMLElement {
     shadow.appendChild(style);
   }
 
-  private _setupEventHandlers() {
+  private setupEventHandlers() {
     const shadow = this.shadowRoot!;
     const playBtn = shadow.getElementById('play');
     const pauseBtn = shadow.getElementById('pause');
 
-    playBtn?.addEventListener('click', () => this._sequencer.start());
-    pauseBtn?.addEventListener('click', () => this._sequencer.stop());
+    playBtn?.addEventListener('click', () => this.sequencer.start());
+    pauseBtn?.addEventListener('click', () => this.sequencer.stop());
 
     // Listen for pad clicks to record steps during playback
     shadow.addEventListener('pad-clicked', (e: unknown) => {
-      const currentStep = this._sequencer.currentStep;
+      const currentStep = this.sequencer.currentStep;
       if (currentStep >= 0) {
-        this._loopRecorder.recordPadAtStep((e as CustomEvent).detail.pad, currentStep);
+        this.loopRecorder.recordPadAtStep((e as CustomEvent).detail.pad, currentStep);
       }
     });
   }

@@ -7,13 +7,13 @@ import { PadButton } from '../pads/Pad';
 import { SequencerListener } from './Sequencer';
 
 export class LoopRecorder implements SequencerListener {
-  private _recordings: Map<number, Set<PadButton>> = new Map();
+  private recordings: Map<number, Set<PadButton>> = new Map();
 
   recordPadAtStep(pad: PadButton, step: number) {
-    if (!this._recordings.has(step)) {
-      this._recordings.set(step, new Set());
+    if (!this.recordings.has(step)) {
+      this.recordings.set(step, new Set());
     }
-    const padsAtStep = this._recordings.get(step)!;
+    const padsAtStep = this.recordings.get(step)!;
     if (padsAtStep.has(pad)) {
       // Already recorded at this step, remove it (toggle off)
       padsAtStep.delete(pad);
@@ -26,17 +26,17 @@ export class LoopRecorder implements SequencerListener {
   }
 
   getRecordingsForStep(step: number): Set<PadButton> {
-    return this._recordings.get(step) || new Set();
+    return this.recordings.get(step) || new Set();
   }
 
   clear() {
-    this._recordings.clear();
+    this.recordings.clear();
   }
 
   private updatePadActiveState(pad: PadButton) {
     // Check if this pad is recorded at any step
     let isRecorded = false;
-    for (const pads of this._recordings.values()) {
+    for (const pads of this.recordings.values()) {
       if (pads.has(pad)) {
         isRecorded = true;
         break;
