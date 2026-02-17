@@ -33,24 +33,17 @@ export class PadsGrid extends HTMLElement {
 
     const shadow = this.attachShadow({ mode: 'open' });
 
-    // create 2 rows of 8 pads
-    const numberOfRows = 2;
-    const breakpoint = NUMBER_OF_PADS / numberOfRows;
+    const container = document.createElement('div');
+    container.className = 'pads';
 
-    for (let i = 0; i < NUMBER_OF_PADS; i += breakpoint) {
-      const row = document.createElement('div');
-      row.className = 'pad-row';
-
-      for (let j = 0; j < breakpoint; j++) {
-        const pad = document.createElement('pad-button');
-        const padIndex = i + j;
-        pad.dataset.pad = padsConfig[padIndex].name;
-        pad.dataset.path = padsConfig[padIndex].path;
-        row.appendChild(pad);
-      }
-
-      shadow.appendChild(row);
+    for (let i = 0; i < NUMBER_OF_PADS; i++) {
+      const pad = document.createElement('pad-button');
+      pad.dataset.pad = padsConfig[i].name;
+      pad.dataset.path = padsConfig[i].path;
+      container.appendChild(pad);
     }
+
+    shadow.appendChild(container);
 
     const style = document.createElement('style');
     style.textContent = `
@@ -59,15 +52,20 @@ export class PadsGrid extends HTMLElement {
         box-sizing: border-box;
         padding: var(--unit);
       }
-      .pad-row {
-        display: flex;
+      .pads {
+        display: grid;
         width: 100%;
         gap: 12px;
-        margin-bottom: 12px;
+        grid-template-columns: repeat(8, 1fr);
       }
       pad-button {
-        flex: 1;
+        width: 100%;
         display: block;
+      }
+      @media (orientation: portrait) {
+        .pads {
+          grid-template-columns: repeat(4, 1fr);
+        }
       }
     `;
 
