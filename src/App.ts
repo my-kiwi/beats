@@ -51,17 +51,15 @@ class App extends HTMLElement {
 
     shadow.innerHTML = `
       <header>
-        <h2>Beats</h2>
-        <div class="bpm-control">
+        <div class="controls">
           <select id="timing-select">
             <option value="32n">32nd</option>
             <option value="16n" selected>16th</option>
             <option value="8n">8th</option>
             <option value="4n">4th</option>
           </select>
-          <label for="bpm-slider">BPM:</label>
-          <input id="bpm-slider" type="range" min="20" max="200" value="100" />
-          <span id="bpm-value">${this.sequencer.currentBpm}</span>
+          <input id="bpm-slider" type="range" min="20" max="250" value="${this.sequencer.currentBpm}" />
+          <input type="number" id="bpm-value" value="${this.sequencer.currentBpm}" maxlength="3" style="width: 5ch;"/>
           <select id="preset-select">
             <option value="">-- Presets --</option>
             <option value="simple-kick">Simple Kick</option>
@@ -69,8 +67,6 @@ class App extends HTMLElement {
             <option value="four-four">Four-Four</option>
             <option value="funky">Funky</option>
           </select>
-        </div>
-        <div class="controls">
           <button id="play">Start</button>
           <button id="pause" style="display: none;">Stop</button>
           <button id="clear">Clear</button>
@@ -93,10 +89,6 @@ class App extends HTMLElement {
         width: 100vw;
       }
       header {
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
         padding: 12px 20px;
       }
       header .bpm-control {
@@ -111,7 +103,7 @@ class App extends HTMLElement {
         white-space: nowrap;
       }
       header .bpm-control input[type="range"] {
-        width: 150px;
+        width: 100px;
       }
       header .bpm-control span {
         min-width: 35px;
@@ -140,7 +132,7 @@ class App extends HTMLElement {
     const pauseBtn = shadow.getElementById('pause') as HTMLButtonElement;
     const clearBtn = shadow.getElementById('clear') as HTMLButtonElement;
     const bpmSlider = shadow.getElementById('bpm-slider') as HTMLInputElement;
-    const bpmValue = shadow.getElementById('bpm-value');
+    const bpmValue = shadow.getElementById('bpm-value') as HTMLInputElement;
     const timingSelect = shadow.getElementById('timing-select') as HTMLSelectElement;
     const presetSelect = shadow.getElementById('preset-select') as HTMLSelectElement;
 
@@ -160,7 +152,14 @@ class App extends HTMLElement {
     bpmSlider.addEventListener('input', (e) => {
       const bpm = parseInt((e.target as HTMLInputElement).value);
       this.sequencer.setBpm(bpm);
-      if (bpmValue) bpmValue.textContent = String(bpm);
+      if (bpmValue) bpmValue.value = String(bpm);
+    });
+
+    bpmValue.addEventListener('change', (e) => {
+      let bpm = parseInt((e.target as HTMLInputElement).value);
+      if (isNaN(bpm)) bpm = 100;
+      this.sequencer.setBpm(bpm);
+      if (bpmSlider) bpmSlider.value = String(bpm);
     });
 
     timingSelect?.addEventListener('change', (e) => {
