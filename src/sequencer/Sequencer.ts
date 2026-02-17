@@ -17,11 +17,8 @@ export class Sequencer {
   private noteTiming: string = '16n';
   private listeners: Set<SequencerListener> = new Set();
 
-  constructor(totalSteps: number = 16, bpm: number = 100, noteTiming: string = '16n') {
-    this.totalSteps = totalSteps;
-    this.bpm = bpm;
-    this.noteTiming = noteTiming;
-    Tone.Transport.bpm.value = bpm;
+  constructor() {
+    Tone.Transport.bpm.value = this.bpm;
   }
 
   get currentStep(): number {
@@ -30,6 +27,10 @@ export class Sequencer {
 
   get isRunning(): boolean {
     return Tone.Transport.state === 'started';
+  }
+
+  get currentBpm(): number {
+    return Tone.Transport.bpm.value;
   }
 
   setBpm(bpm: number) {
@@ -54,6 +55,7 @@ export class Sequencer {
 
   start() {
     if (this.isRunning) return;
+    console.log('Starting sequencer', { bpm: this.bpm, noteTiming: this.noteTiming });
 
     if (!this.loop) {
       let idx = 0;

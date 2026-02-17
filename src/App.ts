@@ -38,7 +38,7 @@ class App extends HTMLElement {
   constructor() {
     super();
 
-    this.sequencer = new Sequencer(16, 50);
+    this.sequencer = new Sequencer();
     this.loopRecorder = new LoopRecorder();
     this.sequencer.subscribe(this.loopRecorder);
 
@@ -61,7 +61,7 @@ class App extends HTMLElement {
           </select>
           <label for="bpm-slider">BPM:</label>
           <input id="bpm-slider" type="range" min="20" max="200" value="100" />
-          <span id="bpm-value">100</span>
+          <span id="bpm-value">${this.sequencer.currentBpm}</span>
           <select id="preset-select">
             <option value="">-- Presets --</option>
             <option value="simple-kick">Simple Kick</option>
@@ -72,7 +72,7 @@ class App extends HTMLElement {
         </div>
         <div class="controls">
           <button id="play">Start</button>
-          <button id="pause">Stop</button>
+          <button id="pause" style="display: none;">Stop</button>
           <button id="clear">Clear</button>
         </div>
       </header>
@@ -136,20 +136,28 @@ class App extends HTMLElement {
 
   private setupEventHandlers() {
     const shadow = this.shadowRoot!;
-    const playBtn = shadow.getElementById('play');
-    const pauseBtn = shadow.getElementById('pause');
-    const clearBtn = shadow.getElementById('clear');
+    const playBtn = shadow.getElementById('play') as HTMLButtonElement;
+    const pauseBtn = shadow.getElementById('pause') as HTMLButtonElement;
+    const clearBtn = shadow.getElementById('clear') as HTMLButtonElement;
     const bpmSlider = shadow.getElementById('bpm-slider') as HTMLInputElement;
     const bpmValue = shadow.getElementById('bpm-value');
     const timingSelect = shadow.getElementById('timing-select') as HTMLSelectElement;
     const presetSelect = shadow.getElementById('preset-select') as HTMLSelectElement;
 
     audioManager.initialize();
-    playBtn?.addEventListener('click', () => this.sequencer.start());
-    pauseBtn?.addEventListener('click', () => this.sequencer.stop());
-    clearBtn?.addEventListener('click', () => this.loopRecorder.clear());
+    playBtn.addEventListener('click', () => {
+      playBtn.style.display = 'none';
+      pauseBtn.style.display = 'inline-block';
+      this.sequencer.start();
+    });
+    pauseBtn.addEventListener('click', () => {
+      playBtn.style.display = 'inline-block';
+      pauseBtn.style.display = 'none';
+      this.sequencer.stop();
+    });
+    clearBtn.addEventListener('click', () => this.loopRecorder.clear());
 
-    bpmSlider?.addEventListener('input', (e) => {
+    bpmSlider.addEventListener('input', (e) => {
       const bpm = parseInt((e.target as HTMLInputElement).value);
       this.sequencer.setBpm(bpm);
       if (bpmValue) bpmValue.textContent = String(bpm);
