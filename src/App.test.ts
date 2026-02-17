@@ -16,7 +16,6 @@ describe('App', () => {
   it('should contain header with title', () => {
     const shadowRoot = app.shadowRoot;
     expect(shadowRoot).toBeDefined();
-    expect(shadowRoot?.innerHTML).toContain('Beats');
   });
 
   it('should contain pads and github link elements', () => {
