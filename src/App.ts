@@ -172,7 +172,6 @@ class App extends HTMLElement {
       const presetKey = (e.target as HTMLSelectElement).value;
       if (presetKey && BEAT_PRESETS[presetKey]) {
         this.loadPreset(presetKey);
-        presetSelect.value = '';
       }
     });
 
@@ -180,6 +179,7 @@ class App extends HTMLElement {
     shadow.addEventListener('pad-clicked', (e: unknown) => {
       const currentStep = this.sequencer.currentStep;
       if (currentStep >= 0) {
+        presetSelect.value = ''; // Clear preset selection when user manually edits
         this.loopRecorder.recordPadAtStep((e as CustomEvent).detail.pad, currentStep);
       }
     });
