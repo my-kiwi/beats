@@ -62,7 +62,8 @@ export class AudioManager {
       this.playerIndex.set(name, nextIndex);
 
       // Do not stop old sounds; allow overlapping playback for polyphony.
-      player.start();
+      player.start(0, 0);
+      // player.start();
     } catch (err) {
       console.warn(`Error playing sound ${name}:`, err);
     }
