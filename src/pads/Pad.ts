@@ -58,6 +58,7 @@ export class PadButton extends HTMLElement {
 
   name: string = '';
   static instances: PadButton[] = [];
+  private skipNextClick = false;
 
   constructor() {
     super();
@@ -65,14 +66,21 @@ export class PadButton extends HTMLElement {
     shadow.appendChild(template.content.cloneNode(true));
     this.button = shadow.querySelector('button') as HTMLButtonElement;
 
+    this.button.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      this.skipNextClick = true;
+      this.activatePad();
+    });
+
     this.button.addEventListener('click', (e) => {
       e.preventDefault();
-      this.playAudio();
-      // Dispatch event for App to handle recording if sequencer is running
-      this.dispatchEvent(
-        new CustomEvent('pad-clicked', { detail: { pad: this }, bubbles: true, composed: true })
-      );
+      if (this.skipNextClick) {
+        this.skipNextClick = false;
+        return;
+      }
+      this.activatePad();
     });
+
     PadButton.instances.push(this);
   }
 
@@ -116,6 +124,13 @@ export class PadButton extends HTMLElement {
     } else {
       this.removeAttribute('playing');
     }
+  }
+
+  private activatePad() {
+    this.playAudio();
+    this.dispatchEvent(
+      new CustomEvent('pad-clicked', { detail: { pad: this }, bubbles: true, composed: true })
+    );
   }
 
   playAudio() {

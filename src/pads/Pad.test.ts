@@ -27,7 +27,24 @@ describe('Pad', () => {
     expect(pad.hasAttribute('active')).toBe(false);
   });
 
-  it('clicking the internal button dispatches pad-clicked event', () => {
+  it('pointerdown on the internal button dispatches pad-clicked event immediately', () => {
+    const btn = pad.shadowRoot?.querySelector('button') as HTMLButtonElement;
+    expect(btn).toBeDefined();
+    let eventCount = 0;
+    pad.addEventListener('pad-clicked', () => {
+      eventCount += 1;
+    });
+
+    // JSDOM may not support PointerEvent, we can dispatch a MouseEvent with type pointerdown.
+    btn.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+    expect(eventCount).toBe(1);
+
+    // Should not fire a second time from the follow-up click
+    btn.click();
+    expect(eventCount).toBe(1);
+  });
+
+  it('clicking the button when not preceded by pointerdown dispatches pad-clicked event', () => {
     const btn = pad.shadowRoot?.querySelector('button') as HTMLButtonElement;
     expect(btn).toBeDefined();
     let eventFired = false;
