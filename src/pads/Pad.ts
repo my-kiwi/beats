@@ -66,11 +66,14 @@ export class PadButton extends HTMLElement {
     shadow.appendChild(template.content.cloneNode(true));
     this.button = shadow.querySelector('button') as HTMLButtonElement;
 
-    this.button.addEventListener('pointerdown', (e) => {
+    const activateFromPointerEvent = (e: Event) => {
       e.preventDefault();
       this.skipNextClick = true;
       this.activatePad();
-    });
+    };
+
+    this.button.addEventListener('pointerdown', activateFromPointerEvent);
+    this.button.addEventListener('touchstart', activateFromPointerEvent, { passive: false });
 
     this.button.addEventListener('click', (e) => {
       e.preventDefault();

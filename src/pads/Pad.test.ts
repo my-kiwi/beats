@@ -44,6 +44,21 @@ describe('Pad', () => {
     expect(eventCount).toBe(1);
   });
 
+  it('touchstart on the internal button dispatches pad-clicked event immediately', () => {
+    const btn = pad.shadowRoot?.querySelector('button') as HTMLButtonElement;
+    expect(btn).toBeDefined();
+    let eventCount = 0;
+    pad.addEventListener('pad-clicked', () => {
+      eventCount += 1;
+    });
+
+    btn.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, cancelable: true, touches: [] }));
+    expect(eventCount).toBe(1);
+
+    btn.click();
+    expect(eventCount).toBe(1);
+  });
+
   it('clicking the button when not preceded by pointerdown dispatches pad-clicked event', () => {
     const btn = pad.shadowRoot?.querySelector('button') as HTMLButtonElement;
     expect(btn).toBeDefined();
