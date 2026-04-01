@@ -7,7 +7,8 @@ import * as Tone from 'tone';
 
 export class AudioManager {
   private buffers: Map<string, Tone.ToneAudioBuffer> = new Map();
-  private players: Map<string, Tone.Player> = new Map();
+  private players: Map<string, Tone.Player[]> = new Map();
+  private playerIndex: Map<string, number> = new Map();
   private isInitialized = false;
 
   async initialize() {
@@ -32,26 +33,35 @@ export class AudioManager {
       );
       this.buffers.set(name, audioBuffer);
 
-      // Keep a pre-created player to avoid re-instantiating on every hit, reducing GC churn and latency.
-      const player = new Tone.Player(audioBuffer).toDestination();
-      player.autostart = false;
-      this.players.set(name, player);
+      // Polyphonic pool: multiple players for overlapping hits (true polyphony)
+      const poolSize = 4;
+      const pool: Tone.Player[] = [];
+      for (let i = 0; i < poolSize; i += 1) {
+        const player = new Tone.Player(audioBuffer).toDestination();
+        player.autostart = false;
+        pool.push(player);
+      }
+      this.players.set(name, pool);
+      this.playerIndex.set(name, 0);
     } catch (err) {
       console.warn(`Failed to load audio buffer ${name} from ${url}:`, err);
     }
   }
 
   playSound(name: string): void {
-    const player = this.players.get(name);
-    if (!player) {
-      console.warn(`Player for ${name} not found`);
+    const pool = this.players.get(name);
+    if (!pool || pool.length === 0) {
+      console.warn(`Player pool for ${name} not found`);
       return;
     }
 
     try {
-      if (player.state === 'started') {
-        player.stop();
-      }
+      const index = this.playerIndex.get(name) ?? 0;
+      const player = pool[index];
+      const nextIndex = (index + 1) % pool.length;
+      this.playerIndex.set(name, nextIndex);
+
+      // Do not stop old sounds; allow overlapping playback for polyphony.
       player.start();
     } catch (err) {
       console.warn(`Error playing sound ${name}:`, err);
@@ -61,7 +71,7 @@ export class AudioManager {
   dispose(): void {
     this.buffers.forEach((buffer) => buffer.dispose());
     this.buffers.clear();
-    this.players.forEach((player) => player.dispose());
+    this.players.forEach((player) => player.forEach((p) => p.dispose()));
     this.players.clear();
   }
 }
