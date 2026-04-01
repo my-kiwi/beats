@@ -7,6 +7,7 @@ import * as Tone from 'tone';
 
 export class AudioManager {
   private buffers: Map<string, Tone.ToneAudioBuffer> = new Map();
+  private players: Map<string, Tone.Player> = new Map();
   private isInitialized = false;
 
   async initialize() {
@@ -30,20 +31,27 @@ export class AudioManager {
         URL.createObjectURL(new Blob([arrayBuffer], { type: 'audio/mpeg' }))
       );
       this.buffers.set(name, audioBuffer);
+
+      // Keep a pre-created player to avoid re-instantiating on every hit, reducing GC churn and latency.
+      const player = new Tone.Player(audioBuffer).toDestination();
+      player.autostart = false;
+      this.players.set(name, player);
     } catch (err) {
       console.warn(`Failed to load audio buffer ${name} from ${url}:`, err);
     }
   }
 
   playSound(name: string): void {
-    const buffer = this.buffers.get(name);
-    if (!buffer) {
-      console.warn(`Buffer ${name} not found`);
+    const player = this.players.get(name);
+    if (!player) {
+      console.warn(`Player for ${name} not found`);
       return;
     }
 
     try {
-      const player = new Tone.Player(buffer).toDestination();
+      if (player.state === 'started') {
+        player.stop();
+      }
       player.start();
     } catch (err) {
       console.warn(`Error playing sound ${name}:`, err);
@@ -53,6 +61,8 @@ export class AudioManager {
   dispose(): void {
     this.buffers.forEach((buffer) => buffer.dispose());
     this.buffers.clear();
+    this.players.forEach((player) => player.dispose());
+    this.players.clear();
   }
 }
 

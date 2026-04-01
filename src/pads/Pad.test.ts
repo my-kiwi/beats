@@ -52,7 +52,9 @@ describe('Pad', () => {
       eventCount += 1;
     });
 
-    btn.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, cancelable: true, touches: [] }));
+    btn.dispatchEvent(
+      new TouchEvent('touchstart', { bubbles: true, cancelable: true, touches: [] })
+    );
     expect(eventCount).toBe(1);
 
     btn.click();
